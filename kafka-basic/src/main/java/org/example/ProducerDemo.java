@@ -10,35 +10,60 @@ import java.util.Properties;
 
 public class ProducerDemo {
 
-    private static final Logger log = LoggerFactory.getLogger(ProducerDemo.class.getSimpleName());
+  private static final Logger log = LoggerFactory.getLogger(ProducerDemo.class.getSimpleName());
 
-    public static void main(String[] args) {
+  public static void main(String[] args) throws InterruptedException {
 
-        log.info("Hello world");
+    log.info("Hello world");
 
-        // create Producer Properties
-        Properties properties = new Properties();
+    // create Producer Properties
+    Properties properties = new Properties();
 
-        // connect to the Kafka cluster localhost:9092
-        properties.setProperty("bootstrap.servers", "localhost:9092");
-        properties.setProperty("key.serializer", StringSerializer.class.getName());
-        properties.setProperty("value.serializer", StringSerializer.class.getName());
-
-
-        // create the Producer
-        KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
+    // connect to the Kafka cluster localhost:9092
+    properties.setProperty("bootstrap.servers", "localhost:9092");
+    properties.setProperty("key.serializer", StringSerializer.class.getName());
+    properties.setProperty("value.serializer", StringSerializer.class.getName());
 
 
-        // create a Producer Record
-        ProducerRecord<String, String> producerRecord = new ProducerRecord<>("demo_java", "Hello World");
+    properties.setProperty("enable.idempotence", "false");
+    // Increase retries to simulate potential duplicate due to retries
+    properties.setProperty("retries", "3");
+    // Reduce the retry backoff to simulate retries more quickly
+    properties.setProperty("retry.backoff.ms", "1");
+    properties.setProperty("acks", "all");
 
-        // send data
-        producer.send(producerRecord);
 
-        // tell the producer to send all data and block until done -- sync
-        producer.flush();
+    // create the Producer
+    KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
 
-        // flush and close the producer
-        producer.close();
+
+    // create a Producer Record
+    for (int i = 1; i <= 30; i++) {
+
+      log.info("Producing record: " + i);
+
+      ProducerRecord<String, String> producerRecord = new ProducerRecord<>("test1", "Hello World " + i);
+
+      // Send data asynchronously and use callback to log result or error
+      producer.send(producerRecord, (metadata, exception) -> {
+        if (exception != null) {
+          log.error("Error while producing", exception);
+        } else {
+          log.info("Produced record to topic {} partition {} offset {}", metadata.topic(), metadata.partition(), metadata.offset());
+        }
+      });
+
+      Thread.sleep(1000);
     }
+
+
+    // send data
+//    producer.send(producerRecord);
+
+    // tell the producer to send all data and block until done -- sync
+    producer.flush();
+
+    // flush and close the producer
+    producer.close();
+  }
 }
