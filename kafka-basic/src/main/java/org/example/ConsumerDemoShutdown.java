@@ -33,6 +33,7 @@ public class ConsumerDemoShutdown {
     properties.setProperty("value.deserializer", StringDeserializer.class.getName());
     properties.setProperty("group.id", groupId);
     properties.setProperty("auto.offset.reset", "earliest");
+    properties.setProperty("max.poll.interval.ms", "7000");
 
     // create the Producer
     KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
@@ -67,6 +68,8 @@ public class ConsumerDemoShutdown {
           log.info("Key: " + record.key() + ", Value: " + record.value());
           log.info("Partition: " + record.partition() + ", Offset: " + record.offset());
         }
+
+        Thread.sleep(6000);
       }
     } catch (WakeupException e) {
       log.error("Consumer is starting to shutdown", e);
