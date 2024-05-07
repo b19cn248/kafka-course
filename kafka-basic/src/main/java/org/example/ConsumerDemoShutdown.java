@@ -1,6 +1,7 @@
 package org.example;
 
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.CooperativeStickyAssignor;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -33,7 +34,8 @@ public class ConsumerDemoShutdown {
     properties.setProperty("value.deserializer", StringDeserializer.class.getName());
     properties.setProperty("group.id", groupId);
     properties.setProperty("auto.offset.reset", "earliest");
-    properties.setProperty("max.poll.interval.ms", "7000");
+    properties.setProperty("auto.commit.interval.ms", "30000");
+//    properties.setProperty("max.poll.interval.ms", "7000");
 
     // create the Producer
     KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
@@ -69,7 +71,7 @@ public class ConsumerDemoShutdown {
           log.info("Partition: " + record.partition() + ", Offset: " + record.offset());
         }
 
-        Thread.sleep(6000);
+//        Thread.sleep(6000);
       }
     } catch (WakeupException e) {
       log.error("Consumer is starting to shutdown", e);

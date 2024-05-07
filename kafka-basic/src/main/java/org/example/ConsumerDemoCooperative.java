@@ -20,8 +20,8 @@ public class ConsumerDemoCooperative {
 
     log.info("Kafka Consumer Demo");
 
-    String groupId = "my-first-application";
-    String topic = "demo_java";
+    String groupId = "my-third-application";
+    String topic = "test1";
 
     // create Producer Properties
     Properties properties = new Properties();
@@ -35,6 +35,7 @@ public class ConsumerDemoCooperative {
     properties.setProperty("group.id", groupId);
     properties.setProperty("auto.offset.reset", "earliest");
     properties.setProperty("partition.assignment.strategy", CooperativeStickyAssignor.class.getName());
+    properties.setProperty("auto.commit.interval.ms", "30000");
 
     // create the Producer
     KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);

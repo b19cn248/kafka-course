@@ -27,9 +27,9 @@ public class ProducerDemo {
 
     properties.setProperty("enable.idempotence", "false");
     // Increase retries to simulate potential duplicate due to retries
-    properties.setProperty("retries", "3");
+    properties.setProperty("retries", "10");
     // Reduce the retry backoff to simulate retries more quickly
-    properties.setProperty("retry.backoff.ms", "1");
+    properties.setProperty("retry.backoff.ms", "10");
     properties.setProperty("acks", "all");
 
 
@@ -38,11 +38,11 @@ public class ProducerDemo {
 
 
     // create a Producer Record
-    for (int i = 1; i <= 30; i++) {
+    for (int i = 1; i <= 10; i++) {
 
       log.info("Producing record: " + i);
 
-      ProducerRecord<String, String> producerRecord = new ProducerRecord<>("test1", "Hello World " + i);
+      ProducerRecord<String, String> producerRecord = new ProducerRecord<>("test2", "Hello World " + i);
 
       // Send data asynchronously and use callback to log result or error
       producer.send(producerRecord, (metadata, exception) -> {

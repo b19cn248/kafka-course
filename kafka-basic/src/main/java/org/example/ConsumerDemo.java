@@ -1,6 +1,7 @@
 package org.example;
 
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.CooperativeStickyAssignor;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
@@ -32,7 +33,8 @@ public class ConsumerDemo {
         properties.setProperty("value.deserializer", StringDeserializer.class.getName());
         properties.setProperty("group.id", groupId);
         properties.setProperty("auto.offset.reset", "earliest");
-//        properties.setProperty("auto.commit.interval.ms", "20000");
+        properties.setProperty("partition.assignment.strategy", CooperativeStickyAssignor.class.getName());
+        properties.setProperty("auto.commit.interval.ms", "30000");
 //        properties.setProperty("max.poll.interval.ms", "5000");
 
 
@@ -44,7 +46,6 @@ public class ConsumerDemo {
 
         // poll for new data
         while (true) {
-            log.info("Consume for new data");
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(1000));
 
 //            try {
